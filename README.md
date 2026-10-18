@@ -46,48 +46,61 @@ refresh, so rows stay retired until the Host's `api-session/removed` agrees.
 
 ## Install
 
-This is a **profile-local** package: it declares no `dsh.bundle`, so `dsh plugin`
-installs it as a plain dependency and it stays out of the layer stack until
-`cordis.patch.yml` names it. Bare `@deepseek-ai/*` imports are resolved by the
-host itself, so the package declares **zero dependencies** — do not add them.
+This package ships a `dsh.bundle` manifest, so `dsh plugin` installs it as a
+profile layer by itself — **you do not need to edit `cordis.patch.yml`**. Bare
+`@deepseek-ai/*` imports are resolved by the host itself, so the package declares
+**zero dependencies** — do not add them.
 
 ```bash
-git clone https://github.com/wilsonchengassistant/dsh-session-delete.git
-dsh plugin add file:/absolute/path/to/dsh-session-delete
+dsh plugin --profile web add wilsonchengassistant/dsh-session-delete
 ```
 
-Then add a root-patch row with a **list** value to the profile's
-`cordis.patch.yml` (usually `~/.dsh/profiles/<profile>/cordis.patch.yml`):
+`dsh plugin` is a pnpm passthrough, so from a clone the same spec works with a
+`file:` path (`dsh plugin --profile web add file:/path/to/dsh-session-delete`),
+or you can clone and install by hand.
 
-```yaml
-- insert:
-    - id: session-delete
-      name: 'dsh-session-delete'
-```
+That command does two things: it adds the package as a dependency, **and** it
+appends it to `dsh.profile.bundles` in the profile's `package.json`. The second
+half is the one people miss — without it the package is just an unused
+dependency, because the bundle patch in [`cordis.patch.yml`](cordis.patch.yml)
+is only read for packages the bundle list names.
 
-Verify it joined the tree — the entry must appear under a `# == …/cordis.patch.yml`
-banner, which is the part that is easy to miss:
+Verify it joined the tree — the entry must appear under a banner naming the
+plugin's own `cordis.patch.yml`, which is the part that is easy to miss:
 
 ```bash
-dsh --profile <profile> --dump-config | grep session-delete
+dsh --profile <profile> --dump-config | grep -B1 session-delete
 ```
 
-`--dump-config` never mounts, so it is safe against the live profile.
+```
+# == …/dsh-session-delete/cordis.patch.yml
+- id: session-delete
+  name: dsh-session-delete
+```
+
+A row under a banner for the *profile's* `cordis.patch.yml` means something
+inserted this plugin by hand and it is **not** installed as a bundle — the
+dependency is present but the layer never composes. `--dump-config` never
+mounts, so it is safe against the live profile.
 
 Finally **restart the harness**. The bundle is composed at boot, so there is no
 partial effect: until it restarts, the menu row is not there.
 
 ### If nothing happens
 
-- **Re-running `dsh plugin add file:<dir>` is a no-op** — same spec, same version.
-  `rm -rf ~/.dsh/profiles/<profile>/node_modules/dsh-session-delete` first, or the
-  profile keeps serving the old copy forever.
+- **Re-running the same add is a no-op** — same spec, same version.
+  `rm -rf ~/.dsh/profiles/<profile>/node_modules/dsh-session-delete` first, or
+  the profile keeps serving the old copy forever.
 - pnpm **copies** the package into the profile rather than symlinking it, so
   editing your clone does not change the running plugin. Copy
   `lib/*.js` into `~/.dsh/profiles/<profile>/node_modules/dsh-session-delete/lib/`.
   `client.js` hot-reloads; `index.js` is host-side and needs a restart.
 - `dsh plugin` needs `pnpm` on `PATH` (`corepack enable pnpm`), or it fails with
   "pnpm was not found".
+- pnpm installs a version **older** than the registry `latest` when a release is
+  less than 24 h old — that is `minimumReleaseAge`, a supply-chain guardrail, not
+  a stale cache. Wait, or use a `^x.y.z` range so the newer release arrives on
+  its own.
 
 ## Design notes
 
@@ -120,6 +133,7 @@ treated as proof; `removeLog()` stats the path afterwards and throws
 | --- | --- |
 | `lib/index.js` | Host half: `TypertRemoteService`, the delete sequence, registry release. |
 | `lib/client.js` | Browser half: the menu row and the `shell.overlay` confirmation dialog. |
+| `cordis.patch.yml` | Bundle patch named by `dsh.bundle`; inserts this plugin into a profile. |
 | `locale/en.json`, `locale/zh.json` | Plugin titles for the Plugins panel. |
 
 The in-app dictionary lives in `lib/client.js` (`zh` is the key-set source of
