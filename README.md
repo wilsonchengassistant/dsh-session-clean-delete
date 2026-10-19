@@ -1,5 +1,9 @@
 # dsh-session-delete
 
+> npm package name: **`dsh-session-clean-delete`** (the unscoped
+> `dsh-session-delete` name on npm belongs to an unrelated author). The
+> repository keeps `dsh-session-delete`, which is free on GitHub.
+
 A permanent **Delete session** action for the DeepSeek Harness sidebar, behind a
 confirmation dialog that tells you what is about to go.
 
@@ -52,12 +56,20 @@ profile layer by itself — **you do not need to edit `cordis.patch.yml`**. Bare
 **zero dependencies** — do not add them.
 
 ```bash
-dsh plugin --profile web add wilsonchengassistant/dsh-session-delete
+dsh plugin --profile web add dsh-session-clean-delete
 ```
 
-`dsh plugin` is a pnpm passthrough, so from a clone the same spec works with a
-`file:` path (`dsh plugin --profile web add file:/path/to/dsh-session-delete`),
-or you can clone and install by hand.
+That is the npm name. The repository is
+[`wilsonchengassistant/dsh-session-delete`](https://github.com/wilsonchengassistant/dsh-session-delete)
+— the unscoped `dsh-session-delete` package name is already taken on npm by an
+unrelated author, and the two are unrelated implementations.
+
+From a source clone, `dsh plugin` is a pnpm passthrough, so a `file:` path works
+too:
+
+```bash
+dsh plugin --profile web add file:/path/to/dsh-session-delete
+```
 
 That command does two things: it adds the package as a dependency, **and** it
 appends it to `dsh.profile.bundles` in the profile's `package.json`. The second
