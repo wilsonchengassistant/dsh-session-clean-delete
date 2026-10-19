@@ -1,8 +1,4 @@
-# dsh-session-delete
-
-> npm package name: **`dsh-session-clean-delete`** (the unscoped
-> `dsh-session-delete` name on npm belongs to an unrelated author). The
-> repository keeps `dsh-session-delete`, which is free on GitHub.
+# dsh-session-clean-delete
 
 A permanent **Delete session** action for the DeepSeek Harness sidebar, behind a
 confirmation dialog that tells you what is about to go.
@@ -59,16 +55,13 @@ profile layer by itself — **you do not need to edit `cordis.patch.yml`**. Bare
 dsh plugin --profile web add dsh-session-clean-delete
 ```
 
-That is the npm name. The repository is
-[`wilsonchengassistant/dsh-session-delete`](https://github.com/wilsonchengassistant/dsh-session-delete)
-— the unscoped `dsh-session-delete` package name is already taken on npm by an
-unrelated author, and the two are unrelated implementations.
+That is the npm name, and it is also the repository name.
 
 From a source clone, `dsh plugin` is a pnpm passthrough, so a `file:` path works
 too:
 
 ```bash
-dsh plugin --profile web add file:/path/to/dsh-session-delete
+dsh plugin --profile web add file:/path/to/dsh-session-clean-delete
 ```
 
 That command does two things: it adds the package as a dependency, **and** it
@@ -81,13 +74,13 @@ Verify it joined the tree — the entry must appear under a banner naming the
 plugin's own `cordis.patch.yml`, which is the part that is easy to miss:
 
 ```bash
-dsh --profile <profile> --dump-config | grep -B1 session-delete
+dsh --profile <profile> --dump-config | grep -B1 session-clean-delete
 ```
 
 ```
-# == …/dsh-session-delete/cordis.patch.yml
-- id: session-delete
-  name: dsh-session-delete
+# == …/dsh-session-clean-delete/cordis.patch.yml
+- id: session-clean-delete
+  name: dsh-session-clean-delete
 ```
 
 A row under a banner for the *profile's* `cordis.patch.yml` means something
@@ -101,11 +94,11 @@ partial effect: until it restarts, the menu row is not there.
 ### If nothing happens
 
 - **Re-running the same add is a no-op** — same spec, same version.
-  `rm -rf ~/.dsh/profiles/<profile>/node_modules/dsh-session-delete` first, or
+  `rm -rf ~/.dsh/profiles/<profile>/node_modules/dsh-session-clean-delete` first, or
   the profile keeps serving the old copy forever.
 - pnpm **copies** the package into the profile rather than symlinking it, so
   editing your clone does not change the running plugin. Copy
-  `lib/*.js` into `~/.dsh/profiles/<profile>/node_modules/dsh-session-delete/lib/`.
+  `lib/*.js` into `~/.dsh/profiles/<profile>/node_modules/dsh-session-clean-delete/lib/`.
   `client.js` hot-reloads; `index.js` is host-side and needs a restart.
 - `dsh plugin` needs `pnpm` on `PATH` (`corepack enable pnpm`), or it fails with
   "pnpm was not found".

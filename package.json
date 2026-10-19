@@ -6,11 +6,11 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wilsonchengassistant/dsh-session-delete.git"
+    "url": "git+https://github.com/wilsonchengassistant/dsh-session-clean-delete.git"
   },
-  "homepage": "https://github.com/wilsonchengassistant/dsh-session-delete#readme",
+  "homepage": "https://github.com/wilsonchengassistant/dsh-session-clean-delete#readme",
   "bugs": {
-    "url": "https://github.com/wilsonchengassistant/dsh-session-delete/issues"
+    "url": "https://github.com/wilsonchengassistant/dsh-session-clean-delete/issues"
   },
   "keywords": [
     "dsh",
