@@ -7,6 +7,8 @@ DSH ships a *Archive* action, which is reversible and keeps the session in the
 Archived list. This plugin adds the irreversible counterpart, and — unlike a
 naive `rm` of the session log — it actually makes the row disappear.
 
+![The session menu in the sidebar, with the Delete session row below Archive](docs/session-menu.png)
+
 ## What it does
 
 Adds one row to the per-session `…` menu in the left sidebar, ordered after
@@ -16,6 +18,8 @@ Pin / Rename / Fork / Archive. Choosing it opens a modal that reports:
 - the **log size** about to be removed,
 - **running turns, subagents, background jobs and reminders** bound to the session,
 - how many reminders are deleted with it.
+
+![The confirmation dialog, reporting the log size and the session's live activity](docs/delete-confirm-dialog.png)
 
 Confirming stops the session's work, unlinks its session directory and projection
 checkpoint, and releases the id from every registry that would otherwise keep
@@ -132,6 +136,20 @@ Remote-service path avoids the question entirely.
 treated as proof; `removeLog()` stats the path afterwards and throws
 `delete/failed` if it survived.
 
+## Localization
+
+The screenshots above show the **Simplified Chinese** UI. The plugin ships
+Simplified Chinese (`zh`) and English (`en`) dictionaries with identical key
+sets, and the strings follow the app's language setting automatically — there is
+nothing to configure.
+
+Traditional Chinese is **not** part of this package. It comes from the separate
+[`dsh-zh-hant`](https://github.com/wilsonchengassistant/dsh-zh-hant) language
+pack, which owns the `zh-Hant` locale for the whole app and derives it
+mechanically from every plugin's `zh` table. Install it and the dialog above
+reads 永久删除会话？; without it you get the Simplified Chinese version, which is
+the expected behaviour rather than a bug.
+
 ## Files
 
 | Path | Role |
@@ -140,6 +158,7 @@ treated as proof; `removeLog()` stats the path afterwards and throws
 | `lib/client.js` | Browser half: the menu row and the `shell.overlay` confirmation dialog. |
 | `cordis.patch.yml` | Bundle patch named by `dsh.bundle`; inserts this plugin into a profile. |
 | `locale/en.json`, `locale/zh.json` | Plugin titles for the Plugins panel. |
+| `docs/*.png` | Screenshots used by this README and by `screenshots.json`. |
 
 The in-app dictionary lives in `lib/client.js` (`zh` is the key-set source of
 truth, `en` is checked complete against it); `locale/*.json` is the metadata the
