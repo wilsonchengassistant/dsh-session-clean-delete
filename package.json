@@ -39,6 +39,7 @@
     }
   },
   "files": [
+    "CHANGELOG.md",
     "cordis.patch.yml",
     "lib/index.js",
     "lib/client.js",
