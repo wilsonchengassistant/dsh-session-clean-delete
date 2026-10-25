@@ -1,7 +1,8 @@
 # dsh-session-clean-delete
 
 A permanent **Delete session** action for the DeepSeek Harness sidebar, behind a
-confirmation dialog that tells you what is about to go.
+confirmation dialog that tells you what is about to go — and a **Lock session**
+action that keeps a session you want to keep.
 
 DSH ships a *Archive* action, which is reversible and keeps the session in the
 Archived list. This plugin adds the irreversible counterpart, and — unlike a
@@ -11,8 +12,9 @@ naive `rm` of the session log — it actually makes the row disappear.
 
 ## What it does
 
-Adds one row to the per-session `…` menu in the left sidebar, ordered after
-Pin / Rename / Fork / Archive. Choosing it opens a modal that reports:
+Adds two rows to the per-session `…` menu in the left sidebar, ordered after
+Pin / Rename / Fork / Archive. The first locks the session; the second deletes
+it behind a confirmation dialog that reports:
 
 - whether the session is **still open on this machine** (it cannot be reopened afterwards),
 - the **log size** about to be removed,
@@ -26,6 +28,30 @@ checkpoint, and releases the id from every registry that would otherwise keep
 listing it. Then the sidebar refreshes and the row is gone.
 
 There is **no undo and no trash folder**. The dialog says so.
+
+## Locking a session
+
+Choosing **Lock session** marks a session as one you want to keep. The menu row
+becomes **Unlock session**, and the delete row stays where it is but is
+**disabled and greyed out** — it is not removed, so the menu still shows what
+the action is and why it cannot be used:
+
+![The locked session menu: the delete row is dimmed and cannot be chosen](docs/locked-session-menu.png)
+
+Nothing in the session list changes. A locked session looks exactly like any
+other; the lock is a state of the action, not a badge on the row.
+
+**The lock is the Host's decision, not the browser's.** `deleteSession` refuses
+a locked session even when the caller never saw the lock — another tab, an old
+client, or a direct RPC call all get `session/locked` and the session stays
+where it is. The greyed-out row is a hint; the refusal is the guarantee.
+
+A lock **outlives a restart**. It is stored in its own storage domain, so
+`dsh web` can be restarted without losing it, and deleting a session removes
+the lock with it.
+
+Only deletion is blocked. Archiving, renaming, forking and using the session
+all work exactly as before.
 
 ## Why it is not just `rm`
 
@@ -52,8 +78,9 @@ refresh, so rows stay retired until the Host's `api-session/removed` agrees.
 
 This package ships a `dsh.bundle` manifest, so `dsh plugin` installs it as a
 profile layer by itself — **you do not need to edit `cordis.patch.yml`**. Bare
-`@deepseek-ai/*` imports are resolved by the host itself, so the package declares
-**zero dependencies** — do not add them.
+`@deepseek-ai/*` imports are resolved by the host itself, so none of them are
+declared. The one declared dependency is `zod`: a storage domain validates
+every stored record with a zod schema, and the session locks live in one.
 
 ```bash
 dsh plugin --profile web add dsh-session-clean-delete
@@ -136,6 +163,17 @@ Remote-service path avoids the question entirely.
 treated as proof; `removeLog()` stats the path afterwards and throws
 `delete/failed` if it survived.
 
+**The lock is a Host-side refusal, not a disabled button.** The browser keeps a
+mirror of the Host's locked set so the delete row can grey itself out without
+asking on every menu open, but the mirror is only a hint: `deleteSession`
+checks its own set and throws `session/locked`. The mirror is refreshed when the
+menu opens, which is when the answer could have changed elsewhere.
+
+**A disabled menu item is greyed by the shell itself** — a disabled item is
+drawn at reduced opacity. The delete row drops its `danger` styling while it is
+disabled, so what is left is the ordinary label colour at that lower opacity: a
+grey rather than a dim red.
+
 ## Localization
 
 The screenshots above show the **Simplified Chinese** UI. The plugin ships
@@ -154,8 +192,8 @@ the expected behaviour rather than a bug.
 
 | Path | Role |
 | --- | --- |
-| `lib/index.js` | Host half: `TypertRemoteService`, the delete sequence, registry release. |
-| `lib/client.js` | Browser half: the menu row and the `shell.overlay` confirmation dialog. |
+| `lib/index.js` | Host half: `TypertRemoteService`, the delete sequence, registry release, the lock set. |
+| `lib/client.js` | Browser half: the lock and delete menu rows, and the `shell.overlay` confirmation dialog. |
 | `cordis.patch.yml` | Bundle patch named by `dsh.bundle`; inserts this plugin into a profile. |
 | `locale/en.json`, `locale/zh.json` | Plugin titles for the Plugins panel. |
 | `docs/*.png` | Screenshots used by this README and by `screenshots.json`. |

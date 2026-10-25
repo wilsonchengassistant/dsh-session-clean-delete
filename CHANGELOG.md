@@ -4,10 +4,38 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased — 1.0.2
+## Unreleased — 1.0.3
 
 _Not yet published. `npm view dsh-session-clean-delete version` still reports
-`1.0.1`; the repository is already at `1.0.2`._
+`1.0.2`; the repository is already at `1.0.3`._
+
+### Added
+
+- **A Lock session action**, in the same per-session `…` menu and directly
+  above the delete row. Choosing it locks the session; the row becomes
+  **Unlock session**, and the delete row stays in place but is **disabled and
+  greyed out** rather than removed. Nothing in the session list changes — a
+  locked session looks like any other.
+
+  The lock is the Host's decision, not the browser's: `deleteSession` refuses a
+  locked session with `session/locked` even when the caller never saw the lock,
+  so another tab, an old client or a direct RPC call cannot delete it either.
+  The greyed row is a hint; the refusal is the guarantee.
+
+  A lock outlives a restart: it is stored in its own `session_locks` storage
+  domain, and deleting a session removes the lock with it. Only deletion is
+  blocked — archiving, renaming, forking and using the session are untouched.
+
+  The grey comes from the shell rather than from custom CSS: a disabled menu
+  item is drawn at reduced opacity, and the delete row drops its `danger`
+  styling while it is disabled, so what is left is the ordinary label colour at
+  that lower opacity — a grey rather than a dim red.
+
+- `zod` is now a declared dependency. A storage domain validates every stored
+  record with `valueSchema.parse`, and that schema has to be a zod schema; the
+  `@deepseek-ai/*` imports are still resolved by the host and are not declared.
+
+## 1.0.2 — 2026-10-25
 
 ### Added
 
