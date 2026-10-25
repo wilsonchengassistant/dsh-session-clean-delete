@@ -1,6 +1,6 @@
 {
   "name": "dsh-session-clean-delete",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Add a permanent Delete session action to the sidebar session context menu, behind a confirmation dialog that reports the log size and the session's live activity before deleting.",
   "license": "MIT",
   "type": "module",

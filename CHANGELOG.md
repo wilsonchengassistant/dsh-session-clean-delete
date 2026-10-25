@@ -4,10 +4,7 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased — 1.0.2
-
-_Not yet published. `npm view dsh-session-clean-delete version` still reports
-`1.0.1`._
+## 1.0.2 — 2026-10-25
 
 ### Added
 
@@ -16,8 +13,10 @@ _Not yet published. `npm view dsh-session-clean-delete version` still reports
   (永久删除会话？ / 会话日志约 41 KB。 / 取消 · 永久删除).
 - `screenshots.json` listing the two images, for the app storefronts that read
   it. The registry probe accepts a plain path array, so the file is one.
-- `screenshots.json` and `docs/*.png` added to `files[]`, so a future tarball
+- `screenshots.json` and `docs/*.png` added to `files[]`, so the tarball
   actually carries them. npm skips a listed file that does not exist, silently.
+- `CHANGELOG.md` added to `files[]`, so the release history ships with the
+  package.
 
 ### Changed
 
